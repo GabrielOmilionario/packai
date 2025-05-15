@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #111;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 10px #333;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input {
+      background: #222;
+      color: #fff;
+    }
+
+    button {
+      background: #04c;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #036;
+    }
+
+    #ativacao-section {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="login-section">
+    <h2>Login do Admin</h2>
+    <input type="email" id="admin-email" placeholder="Seu e-mail">
+    <input type="password" id="admin-senha" placeholder="Sua senha">
+    <button onclick="fazerLogin()">Entrar</button>
+    <p id="msg-login"></p>
+  </div>
+
+  <div class="card" id="ativacao-section">
+    <h2>Ativar Assinatura</h2>
+    <input type="email" id="email-cliente" placeholder="E-mail do cliente">
+    <button onclick="ativarAssinatura()">Ativar por 30 dias</button>
+    <button onclick="logout()">Sair</button>
+    <p id="msg-ativacao"></p>
+  </div>
+
+  <script>
+    const supabase = supabase.createClient(
+      'https://zftcaawfqiyrnjbakepe.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmdGNhYXdmcWl5cm5qYmFrZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNjM5MjksImV4cCI6MjA2MjczOTkyOX0.61EYYvm45XZ--qGp2lFLo7WHKCMpcB7LsiADG8jxXJA'
+    );
+
+    async function fazerLogin() {
+      const email = document.getElementById('admin-email').value;
+      const senha = document.getElementById('admin-senha').value;
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: senha
+      });
+
+      if (error) {
+        document.getElementById('msg-login').textContent = "Erro: " + error.message;
+      } else {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('ativacao-section').style.display = 'block';
+      }
+    }
+
+    async function ativarAssinatura() {
+      const email = document.getElementById('email-cliente').value;
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (userError || !userData) {
+        document.getElementById('msg-ativacao').textContent = "Usuário não encontrado.";
+        return;
+      }
+
+      const userId = userData.id;
+      const agora = new Date();
+      const expiracao = new Date(agora.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 dias
+
+      const { error } = await supabase
+        .from('assinaturas')
+        .upsert([
+          {
+            user_id: userId,
+            data_ativacao: agora.toISOString(),
+            data_expiracao: expiracao.toISOString()
+          }
+        ]);
+
+      if (error) {
+        document.getElementById('msg-ativacao').textContent = "Erro ao ativar: " + error.message;
+      } else {
+        document.getElementById('msg-ativacao').textContent = "Assinatura ativada com sucesso!";
+      }
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+  </script>
+</body>
+</html>

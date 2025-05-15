@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Área de Membros - Estilo Netflix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabase = supabase.createClient(
+      'https://zftcaawfqiyrnjbakepe.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmdGNhYXdmcWl5cm5qYmFrZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNjM5MjksImV4cCI6MjA2MjczOTkyOX0.61EYYvm45XZ--qGp2lFLo7WHKCMpcB7LsiADG8jxXJA'
+    );
+
+    async function verificarAcesso() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('assinaturas')
+        .select('data_expiracao')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error || !data) {
+        alert("Assinatura não encontrada.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const agora = new Date();
+      const expira = new Date(data.data_expiracao);
+
+      if (agora > expira) {
+        alert("Sua assinatura expirou.");
+        window.location.href = "login.html";
+      }
+    }
+
+    verificarAcesso();
+  </script>
+
+  <style>
+    /* Seu CSS continua aqui... */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    /* ... pode colar o restante do seu CSS aqui normalmente ... */
+  </style>
+</head>
+<body>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Área de Membros - Estilo Netflix</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px 20px;
+      font-size: 2rem;
+      font-weight: 700;
+      background: #000;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 20px 40px;
+    }
+
+    .search-container input {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      background: #1a1a1a;
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .search-container input:focus {
+      background: #333;
+    }
+
+    .section {
+      margin: 30px 0;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+
+    .row {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 10px;
+    }
+
+    .row::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .row::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+    }
+
+    .row::-webkit-scrollbar-track {
+      background: #222;
+    }
+
+    .item {
+      min-width: 220px;
+      height: 168px; /* aumento de 20% */
+      background: #1a1a1a;
+      border-radius: 10px;
+      margin-right: 15px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: transform 0.3s;
+      cursor: pointer;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .item:hover {
+      transform: scale(1.05);
+      background: #333;
+    }
+
+    .support {
+      margin: 60px 20px 30px;
+      padding: 30px;
+      background: #111;
+      border-radius: 15px;
+      text-align: center;
+      color: #ccc;
+    }
+
+    .support h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    .support p {
+      margin: 10px 0;
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .item {
+        min-width: 160px;
+        height: 130px;
+        font-size: 0.9rem;
+      }
+      header {
+        font-size: 1.5rem;
+      }
+      .section-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  👋 Seja Bem-vindo(a) à Área de Membros!
+</header>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="🔎 Pesquise por uma ferramenta..." onkeyup="searchItems()">
+</div>
+
+<div class="section">
+  <h2 class="section-title">Inteligências Artificiais e Mineração de Anúncios</h2>
+  <div class="row" id="row1">
+    <style>
+      .item {
+        width: 200px;
+        height: 200px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+      }
+
+      .item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .item-name {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        padding: 5px 0;
+        font-size: 14px;
+      }
+    </style>
+    <a href="gpt4.html" target="_blank" class="item">
+      <img src="https://i.postimg.cc/HsbL7Vxk/GPT.png" alt="Chatbot Avançado">
+      <div class="item-name">CHAT GPT PRO</div>
+    </a>
+    <a href="pipiads.html" target="_blank" class="item">
+      <img src="https://i.postimg.cc/4dyHf1v0/pipiadds.png" alt="Tradutor Instantâneo">
+      <div class="item-name">PIPI ADS</div>
+    </a>
+
+    <a href="clicopy.html" target="_blank" class="item">
+      <img src="https://i.postimg.cc/tJP3b5pj/adsparo.png" alt="Reconhecimento de Imagem">
+      <div class="item-name">ADS PARO</div>
+    </a>
+
+    <a href="clicopy.html" target="_blank" class="item">
+      <img src="https://i.postimg.cc/g0HBF3mQ/clicopy.png" alt="Detecção de Fraudes">
+      <div class="item-name">CLICOPY</div>
+    </a>
+
+    <a href="dreamface.html" target="_blank" class="item">
+      <img src="https://i.postimg.cc/j5ZSWcJy/dreamface.png" alt="Assistente Virtual">
+      <div class="item-name">DREAM FACE</div>
+    </a>
+    </a>
+  </div>
+</div>
+
+
+<div class="section">
+  <h2 class="section-title">Imagens de Vídeos</h2>
+    <div class="row" id="row1">
+      <style>
+        .item {
+          width: 200px;
+          height: 200px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+          text-align: center;
+          font-family: Arial, sans-serif;
+          cursor: pointer;
+          text-decoration: none;
+          display: block;
+          color: inherit;
+        }
+  
+        .item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+  
+        .item-name {
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          background: rgba(0,0,0,0.6);
+          color: white;
+          padding: 5px 0;
+          font-size: 14px;
+        }
+      </style>
+  
+      <a href="photoshop.html" target="_blank" class="item">
+        <img src="https://i.postimg.cc/wjckqXs5/PS.png" alt="AI TOOL 1">
+        <div class="item-name">PHOTOSHOP</div>
+      </a>
+  
+      <a href="capcut.html" target="_blank" class="item">
+        <img src="https://i.postimg.cc/VNsspw89/capcut.png" alt="Chatbot Avançado">
+        <div class="item-name">CAPCUT PRO</div>
+      </a>
+  
+      <a href="canva.html" target="_blank" class="item">
+        <img src="https://i.postimg.cc/9MqRM2n3/Logo-Canva-Pro.png" alt="Gerador de Voz">
+        <div class="item-name">CANVA PRO</div>
+      </a>
+
+      <a href="https://drive.google.com/drive/folders/1HYhncaTKAnRYp8btyWl5fu5C55A4JO80" target="_blank" class="item">
+        <img src="https://i.postimg.cc/4Ns7nZ1t/shopify.png" alt="Analisador de Texto">
+        <div class="item-name">TEMAS PARA SHOPIFY</div>
+      </a>
+      
+      <a href="https://drive.google.com/drive/folders/1SOnEw1n3kueLbEd5_fwUlQi9I83Umydw" target="_blank" class="item">
+        <img src="https://i.postimg.cc/gkzjmsYH/corel.png" alt="Reconhecimento de Imagem">
+        <div class="item-name">COREL DRAW</div>
+      </a>
+  
+      <a href="paginas.html" target="_blank" class="item">
+        <img src="https://i.postimg.cc/J4VgkYyj/paginas-de-vendas.png" alt="Detecção de Fraudes">
+        <div class="item-name">PÁGINAS DE VENDAS MILIONÁRIAS</div>
+      </a>
+  
+      <a href="frelahub.html" target="_blank" class="item">
+        <img src="https://i.postimg.cc/Sssf3hQw/freela.png" alt="Assistente Virtual">
+        <div class="item-name">FREELAHUB</div>
+      </a>
+  
+    </div>
+  </div>
+  
+
+<div class="section">
+  <h2 class="section-title">Diversos</h2>
+    <div class="row" id="row1">
+      <style>
+        .item {
+          width: 200px;
+          height: 200px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+          text-align: center;
+          font-family: Arial, sans-serif;
+          cursor: pointer;
+          text-decoration: none;
+          display: block;
+          color: inherit;
+        }
+  
+        .item img {
+          width: 100%;Ofer
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+  
+        .item-name {
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          background: rgba(0,0,0,0.6);
+          color: white;
+          padding: 5px 0;
+          font-size: 14px;
+        }
+      </style>
+  
+      <a href="https://drive.google.com/drive/folders/15PWeTwOTcSTRtQSG2x8mvks666ujLC8z?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/zBrg1rjx/zapvoice.png" alt="AI TOOL 1">
+        <div class="item-name">ZAP VOICE</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1MZgqGUFuHRtHQYeK-E0fYeWAYMHWgsUe?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/zG6Xmwkp/anoni.png" alt="MIDJOURNEY">
+        <div class="item-name">PACK ESPIONAGEM</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1HyQuSzkd8FkNGWjBc2qo8ZIwJRWGFtNI?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/qvd6nL2S/black.png" alt="Gerador de Voz">
+        <div class="item-name">ARQUIVOS BLACKRAT</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1YMAWNnvVjZ4a-C_z0L3vlJ2XIAKviaN9?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/85nZw5GF/excel.png" alt="Chatbot Avançado">
+        <div class="item-name">15 MIL PLANILHAS</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1Gd5snW8XNU3MMOIqeJfgLIRdG4BJqGyj?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/9MqRM2n3/Logo-Canva-Pro.png" alt="Analisador de Texto">
+        <div class="item-name">PACK CANVA MKT</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1jQ1x3JVY_f5CwhVIE2Oj5J3-0HZ697Yr?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/QdJgMtH2/gptblack.png" alt="Tradutor Instantâneo">
+        <div class="item-name">PROMOTS SECRETOS</div>
+      </a>
+  
+      <a href="https://drive.google.com/drive/folders/1uprHfwyBddmigZCzkIgBmdwUSeZPUqPl?usp=drive_link" target="_blank" class="item">
+        <img src="https://i.postimg.cc/y6pbVLwm/cxursos.png" alt="Reconhecimento de Imagem">
+        <div class="item-name">PREMIUM CURSOS</div>
+      </a>
+  
+      <a href="https://t.me/+qRVHBwXTMPUwZTBh" target="_blank" class="item">
+        <img src="https://i.postimg.cc/0yZs0Yzc/free.png" alt="Detecção de Fraudes">
+        <div class="item-name">IPTV ILIMITADO</div>
+      </a>
+
+    </div>
+  </div>
+
+  
+<!-- Seção de Suporte -->
+<div class="support">
+  <h2>Suporte</h2>
+  <p>📞 Telefone: (11) 99204-8396</p>
+  <p>📩 Instagram: @packaiferramentas</p>
+</div>
+
+<script>
+  function searchItems() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const items = document.querySelectorAll('.item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (text.includes(input)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
